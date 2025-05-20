@@ -12,16 +12,16 @@ app = Flask(__name__)
 CORS(app)
 
 # === Chargement des modèles et encodeurs ===
-with open('models/modele_maladies.pkl', 'rb') as f:
+with open('modele_maladies.pkl', 'rb') as f:
     model = pickle.load(f)
 
-with open('models/scaler_maladies.pkl', 'rb') as f:
+with open('scaler_maladies.pkl', 'rb') as f:
     scaler = pickle.load(f)
 
-with open('models/label_encoder_maladies.pkl', 'rb') as f:
+with open('label_encoder_maladies.pkl', 'rb') as f:
     disease_encoder = pickle.load(f)
 
-with open('models/soil_encoder.pkl', 'rb') as f:
+with open('soil_encoder.pkl', 'rb') as f:
     soil_encoder = pickle.load(f)
 
 # === Mapping des types de sol à envoyer au frontend ===
