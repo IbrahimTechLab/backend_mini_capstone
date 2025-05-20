@@ -7,10 +7,17 @@ import os
 # === Téléchargement et chargement sécurisés ===
 from fetch_from_drive import download_model
 
-def safe_load_pickle(filename):
+def safe_load_pickle(filename, zip_source=None):
+    """
+    Télécharge et charge un fichier pickle.
+    Si le fichier provient d'une archive zip, on déclenche le téléchargement du .zip.
+    """
     model_path = os.path.join("models", filename)
     if not os.path.exists(model_path):
-        download_model(filename)
+        if zip_source:
+            download_model(zip_source)  # ex: 'modele_maladies.zip'
+        else:
+            download_model(filename)
     with open(model_path, 'rb') as f:
         return pickle.load(f)
 
@@ -19,7 +26,7 @@ app = Flask(__name__)
 CORS(app)
 
 # === Chargement des modèles et encodeurs avec protection ===
-model = safe_load_pickle('modele_maladies.pkl')
+model = safe_load_pickle('modele_maladies.pkl', zip_source='modele_maladies.zip')
 scaler = safe_load_pickle('scaler_maladies.pkl')
 disease_encoder = safe_load_pickle('label_encoder_maladies.pkl')
 soil_encoder = safe_load_pickle('soil_encoder.pkl')
