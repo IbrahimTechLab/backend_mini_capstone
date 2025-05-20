@@ -1,19 +1,31 @@
 import gdown
 import os
 
-def download_model():
-    url = "https://drive.google.com/uc?id=1J_uBeeDSdrY0dnyp7PM25j8IfILAI4bG"
-    output_path = "models/modele_maladie.pkl"
+# Dictionnaire des fichiers à télécharger avec leurs IDs Google Drive (juste les IDs, sans URL)
+GDRIVE_IDS = {
+    'modele_maladies.pkl': '1J_uBeeDSdrY0dnyp7PM25j8IfILAI4bG',
+    'scaler_maladies.pkl': '1RM9iwdvyecSNuEH_cyYaBRWOAfvVkdwr',
+    'label_encoder_maladies.pkl': '1rb1aUGhtHn_dmdB149qWrXDLB_wzCwPO',
+    'soil_encoder.pkl': '14EqyjLzD6kp7tB5CPXWg9WbgQUen4TMS'
+}
 
-    # Crée le dossier models si nécessaire
+def download_model(filename):
+    """Télécharge un fichier spécifique depuis Google Drive, s'il est absent."""
+    if filename not in GDRIVE_IDS:
+        raise ValueError(f"Fichier non reconnu ou ID manquant : {filename}")
+
+    file_id = GDRIVE_IDS[filename]
+    url = f"https://drive.google.com/uc?id={file_id}"
+    output_path = os.path.join("models", filename)
+
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
-    # Télécharge le fichier s'il n'existe pas déjà
     if not os.path.exists(output_path):
-        print("Téléchargement du modèle depuis Google Drive...")
+        print(f"Téléchargement de {filename} depuis Google Drive...")
         gdown.download(url, output_path, quiet=False)
     else:
-        print("Modèle déjà présent. Pas de téléchargement nécessaire.")
+        print(f"{filename} déjà présent. Pas de téléchargement nécessaire.")
 
 if __name__ == "__main__":
-    download_model()
+    for fname in GDRIVE_IDS:
+        download_model(fname)
