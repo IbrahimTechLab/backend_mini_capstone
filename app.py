@@ -4,27 +4,27 @@ import pickle
 import numpy as np
 import os
 
-# Téléchargement des fichiers modèles depuis Google Drive
+# === Téléchargement et chargement sécurisés ===
 from fetch_from_drive import download_model
-download_model()
 
+def safe_load_pickle(filename):
+    model_path = os.path.join("models", filename)
+    if not os.path.exists(model_path):
+        download_model(filename)
+    with open(model_path, 'rb') as f:
+        return pickle.load(f)
+
+# === Initialisation de Flask ===
 app = Flask(__name__)
 CORS(app)
 
-# === Chargement des modèles et encodeurs ===
-with open('modele_maladies.pkl', 'rb') as f:
-    model = pickle.load(f)
+# === Chargement des modèles et encodeurs avec protection ===
+model = safe_load_pickle('modele_maladies.pkl')
+scaler = safe_load_pickle('scaler_maladies.pkl')
+disease_encoder = safe_load_pickle('label_encoder_maladies.pkl')
+soil_encoder = safe_load_pickle('soil_encoder.pkl')
 
-with open('scaler_maladies.pkl', 'rb') as f:
-    scaler = pickle.load(f)
-
-with open('label_encoder_maladies.pkl', 'rb') as f:
-    disease_encoder = pickle.load(f)
-
-with open('soil_encoder.pkl', 'rb') as f:
-    soil_encoder = pickle.load(f)
-
-# === Mapping des types de sol à envoyer au frontend ===
+# === Mapping des types de sol pour le frontend ===
 soil_mapping = {i: soil_type for i, soil_type in enumerate(soil_encoder.classes_)}
 
 @app.route('/api/soil-types', methods=['GET'])
@@ -42,7 +42,7 @@ def predict_disease():
         'organic_carbon', 'sodium', 'potassium', 'nitrogen', 'phosphorus'
     ]
     
-    # Vérification des champs manquants
+    # Vérifie les champs manquants
     missing_fields = [field for field in required_fields if field not in data]
     if missing_fields:
         return jsonify({'error': f'Champs manquants : {missing_fields}'}), 400
